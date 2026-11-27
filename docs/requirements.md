@@ -41,7 +41,7 @@ Bandwidth options (resolution column is calculated):
 | B, full listed band | 5.725-5.850 | 125 | 1.199 | Rejected: no guard for edge tolerance and spectral skirts |
 | **C, chosen** | 5.730-5.845 | 115 | 1.303 | Radiated design case. 5 MHz guards are an assumption, to be checked at Gate 1 and Gate 5 |
 
-Choosing C does not by itself permit transmission (M-01).
+Choosing C does not by itself permit transmission (M-01). The owner reports that, from their own research and a faculty member, on-campus project use should have no legal limitation; no citable rule or written statement is on file, so M-01 stays open ([decision 002](decisions/002-performance-targets.md)).
 
 ## 2. What "resolution" means
 
@@ -55,7 +55,9 @@ Sim result. Criterion (**assumption**): two equal echoes near 20 m, noiseless; t
 | 125 | 1.199 | 1.9 | 3.0 |
 | 115 | 1.303 | 2.0 | 3.2 |
 
-The open Gate 0 decision is which definition the resolution requirement uses. Rectangular windowing separates closer targets but has higher sidelobes, which can hide a weak target next to a strong one.
+**Chosen** ([decision 002](decisions/002-performance-targets.md)): the resolution requirement is the two-target criterion with the rectangular window, 2.5 m or less at 115 MHz and 2.0 m or less at 150 MHz (conducted only) (R-19). Rectangular windowing separates closer targets but has higher sidelobes, which can hide a weak target next to a strong one. It does not show the same separation with the Hann window.
+
+The table holds near 20 m only. The architect agent's simulation found that 115 MHz with the rectangular window needs 2.1 m at 3 m. That script is not saved, and the existing tests do not assert the table values; Gate 1 must reproduce both with tests.
 
 ## 3. Proposed requirements
 
@@ -64,7 +66,7 @@ The open Gate 0 decision is which definition the resolution requirement uses. Re
 | R-01 | Radiated sweep | 5.730-5.845 GHz | assumption | Decision 001; permission to transmit still open (M-01) |
 | R-02 | Sweep bandwidth, radiated / conducted only | 115 MHz / 150 MHz | assumption | 150 MHz only through cables and dummy load unless authorized |
 | R-03 | Range bin c/(2B), 115 MHz | 1.303 m | calculated | 150 MHz: 0.999 m. Replaces "~1 m" for radiated tests |
-| R-04 | Maximum demo range, indoor | about 30 m | assumption | Target type and size undefined (M-03) |
+| R-04 | Maximum demo range | about 30 m | assumption | Charter says indoor; the owner mentioned a field as a possible site (M-03). Target: R-20 |
 | R-05 | Chirp (ramp) time T | 1 ms | assumption | Sawtooth assumed; shape and repetition period not decided |
 | R-06 | Slope S = B/T, 115 MHz | 1.15e11 Hz/s | calculated | 150 MHz: 1.5e11 Hz/s |
 | R-07 | Beat frequency at 30 m, 115 MHz | 23 016 Hz | calculated | f_b = 2RS/c; 150 MHz: 30 021 Hz |
@@ -75,10 +77,19 @@ The open Gate 0 decision is which definition the resolution requirement uses. Re
 | R-12 | Round-trip delay at 30 m | 200 ns (0.02 % of T) | calculated | |
 | R-13 | ADC resolution used in the sim | 12 bit, ±1 V | assumption | Placeholder. The BOM lists a 16-bit part |
 | R-14 | Raw data rate, 100 kSPS in 16-bit words, continuous | 1.6 Mbit/s | calculated | Without protocol overhead. ESP32-S3 USB throughput not checked (Gate 2) |
-| R-15 | Range accuracy, one strong target | not set | n/a | See M-04. Ideal sim below is not an accuracy requirement |
+| R-15 | Range accuracy, one target | error 0.20 m or less in 95 % of trials, at SNR 20 dB or more | assumption | SNR after Hann FFT and integration. One isolated static reflector (others at least R-19 spacing away), 3-30 m, one offset calibration at a distance not used as a test point. At 95 % confidence: 59 or more independent trials with no failure (calculated). Ideal sim below does not show this |
 | R-16 | Power amplifier in v1 | none | assumption | Locked decision |
 | R-17 | Chirp source | ADF4159 plus VCO, linear sweep | assumption | Locked decision; VCO is a candidate only |
 | R-18 | First tests | cables and dummy load only | assumption | Project rule |
+| R-19 | Two equal targets shown separately | 2.5 m spacing or less at 115 MHz; 2.0 m or less at 150 MHz (conducted or sim only) | assumption | Rectangular window; peaks within c/(8B) of truth, dip 3 dB or more (section 2) |
+| R-20 | Reference target | static triangular trihedral reflector, 0.15 m leg edge | assumption | Two needed for R-19 live. Peak radar cross-section about 0.79 m² at 5.7875 GHz (calculated, 4πa⁴/(3λ²); textbook formula, source page not checked) |
+| R-21 | Minimum range | 3 m | assumption | R-08 gives the beat frequency |
+| R-22 | Detection | Pd 0.90 or more at Pfa 1e-4 | assumption | Pfa per range cell per frame; steady target (Swerling 0). 11.7 dB SNR needed (calculated: known threshold, white Gaussian noise, square-law detector, one integrated look; adaptive threshold loss not calculated). Tests: Pd 29 of 29, or 279 or more of 300; Pfa bound, no alarm in 30 000 independent noise-only cells (calculated, 95 % confidence for the zero-miss and zero-alarm tests) |
+| R-23 | Update rate | 10 Hz or more, 16 chirps per frame | assumption | Raw data 256 kbit/s in 16-bit words without overhead (calculated, with R-09 at 100 kSPS and R-05) |
+| R-24 | Live display, latency | 200 ms or less | assumption | Latency start and end points not defined |
+| R-25 | Processing window | rectangular for the R-19 test only; Hann otherwise | assumption | |
+
+R-15 and R-19 to R-25 are the "Balanced" targets chosen in [decision 002](decisions/002-performance-targets.md). None has been shown to be achievable on hardware. The same limits apply to 150 MHz conducted tests, except the R-19 spacing.
 
 ### Sim results behind the requirements (all calculated, ideal conditions)
 
@@ -111,10 +122,10 @@ The millimetre errors describe the peak estimator only. Hardware error also incl
 | ID | Missing | Why it matters | Needed by |
 |---|---|---|---|
 | M-01 | Legal basis for radiating: band, device class, FMCW eligibility, limits, certification, current authority | Needed before any radiation; may change the sweep or require CRT authorization | before radiating |
-| M-02 | Resolution definition (bin, or two-target criterion and window) | Pass/fail for the demo | G0 |
-| M-03 | Reference targets (type, radar cross-section), minimum range, scene | "30 m" cannot be tested without them | G0 |
-| M-04 | Pass/fail limits: range accuracy, detection probability, false-alarm rate, minimum SNR | Gate 6 acceptance | G0 |
-| M-05 | Update rate and latency; live display or logged data | Chirp repetition, USB, software | G0 |
+| M-02 | **Target chosen** (R-19). Open: saved tests that reproduce it | Pass/fail for the demo | G1 |
+| M-03 | Reference target and minimum range **chosen** (R-20, R-21). Open: test site and scene; whether a person or moving target matters (not answered; R-20 assumes static) | "30 m" cannot be tested without a scene | before live tests |
+| M-04 | **Targets chosen** (R-15, R-22). Open: feasibility, and whether Gate 6 can pass on conducted evidence if M-01 is open | Gate 6 acceptance | G1 / G6 |
+| M-05 | Update rate, latency and live display **chosen** (R-23, R-24). Open: latency definition, USB throughput | Chirp repetition, USB, software | G2 |
 | M-06 | Link budget inputs: TX power, antenna gain, losses, noise figure, cross-section, SNR needed | The sim's amplitudes and noise are placeholders. No link budget exists yet | G1/G2 |
 | M-07 | TX-RX antenna isolation and leakage tolerance | Can saturate the LNA, mixer or ADC | G1/G2 |
 | M-08 | Chirp quality: shape, settling, idle time, linearity, phase noise; PLL reference and loop bandwidth | Resolution and noise floor | G1 |
