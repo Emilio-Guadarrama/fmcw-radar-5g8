@@ -13,6 +13,15 @@ from radar_display.server import HOST, make_server
 from radar_display.simulated import SimulatedSource
 
 
+def keep_window_open() -> None:
+    """A double-clicked .exe closes its window on exit, hiding any message."""
+    if getattr(sys, "frozen", False):
+        try:
+            input("Press Enter to close this window.")
+        except (EOFError, KeyboardInterrupt, OSError, RuntimeError):
+            pass  # no keyboard attached
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--port", type=int, default=8765)
@@ -23,11 +32,18 @@ def main() -> int:
     try:
         server = make_server(engine, args.port)
     except (OSError, OverflowError) as error:
-        print(f"Cannot use port {args.port}: {error}\nTry --port 8766")
+        print(
+            f"Cannot use port {args.port}: {error}\n"
+            "Is the display already running? Close it, or start with --port 8766"
+        )
+        keep_window_open()
         return 1
     engine.start()
     url = f"http://{HOST}:{server.server_address[1]}/"
-    print(f"SPECULA-1 display (SIMULATED data) at {url}\nPress Ctrl+C to stop.")
+    print(
+        f"SPECULA-1 display (SIMULATED data) at {url}\nPress Ctrl+C to stop.",
+        flush=True,
+    )
     if not args.no_browser:
         webbrowser.open(url)
     try:

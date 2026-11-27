@@ -22,6 +22,25 @@ uv pip install --python .venv -r software/requirements.txt
 
 (If `uv` reports `invalid peer certificate: UnknownIssuer`, add `--system-certs`.)
 
+## Build a Windows .exe (optional)
+
+This makes one file, `software/dist/specula-display.exe`, which carries Python and `numpy` inside it. It still shows simulated data only. Install the build tools once, then build:
+
+```powershell
+uv pip install --python .venv -r software/requirements-build.txt
+```
+
+```powershell
+.venv\Scripts\python.exe software/build_exe.py
+```
+
+Double-clicking the `.exe` should open a console window and show the display in your browser. Press Ctrl+C in that window to stop it (tested from a terminal). Double-clicking, the automatic browser opening and stopping by closing the window have not been tested with the `.exe`. Only one copy can use port 8765, so stop any other running display first, or start with `--port 8766`.
+
+- The `.exe` is a snapshot. Rebuild it after changing the code.
+- Git ignores `software/dist/`, so a build is not committed.
+- It was tested only on the PC that built it, run from an empty folder with Python removed from the search path. It has **not** been tried on a PC without Python.
+- It is not code-signed, so Windows or antivirus software on another PC may warn about it or block it.
+
 ## Test and format
 
 ```powershell
