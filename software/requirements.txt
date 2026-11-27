@@ -1,0 +1,4 @@
+# Running the display needs only numpy; the versions match sim/requirements.txt.
+numpy==2.5.5
+pytest==9.2.0
+ruff==0.17.6

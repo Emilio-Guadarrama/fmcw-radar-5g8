@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SPECULA-1 live display (simulated)</title>
+  <meta name="description" content="Preliminary live display for the SPECULA-1 FMCW radar. Simulated data only.">
+  <meta name="theme-color" content="#0c0d0e">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2317181a'/%3E%3Cg fill='none' stroke='%233987e5' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M8 17a7 7 0 0 1 7 7'/%3E%3Cpath d='M8 9a15 15 0 0 1 15 15'/%3E%3C/g%3E%3Ccircle cx='8.5' cy='23.5' r='2.5' fill='%23f2f2ef'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <a class="skip" href="#graphs">Skip to the graphs</a>
+  <header class="banner">
+    <p><strong id="banner-title">SIMULATED DATA</strong>
+      <span id="banner-text">No radar hardware is connected. Nothing here is a measurement.</span></p>
+    <p class="notx">Neither sweep is cleared to transmit. This app has no transmitter control.</p>
+  </header>
+
+  <div class="topbar">
+    <h1>SPECULA-1 <span>preliminary live display</span></h1>
+    <dl class="inuse" aria-label="Settings in use">
+      <div class="wide"><dt>Simulated sweep</dt><dd><span id="sweep-name">–</span> <em id="sweep-note"></em></dd></div>
+      <div><dt>Chirp time</dt><dd id="u-chirp">–</dd></div>
+      <div><dt>Sample rate</dt><dd id="u-rate">–</dd></div>
+      <div><dt>Chirps per frame</dt><dd id="u-chirps">–</dd></div>
+      <div><dt>Window</dt><dd id="u-window">–</dd></div>
+    </dl>
+    <span id="link" class="link" role="status">connecting…</span>
+  </div>
+  <div id="alert" class="alert" role="alert" hidden></div>
+
+  <section class="readouts panel" aria-label="Live readings">
+    <article class="readout hero">
+      <h2>Strongest target</h2>
+      <p class="value"><span id="t-range">–</span><small>m</small></p>
+      <p class="sub" id="t-range-sub">Distance to the loudest echo</p>
+    </article>
+    <article class="readout">
+      <h2>Signal-to-noise (SNR)</h2>
+      <p class="value"><span id="t-snr">–</span><small>dB</small></p>
+      <p class="sub" id="t-snr-sub">Echo above the noise</p>
+    </article>
+    <article class="readout">
+      <h2>Update rate</h2>
+      <p class="value"><span id="t-rate">–</span><small>Hz</small></p>
+      <p class="sub" id="t-rate-sub">Measurements per second</p>
+    </article>
+    <article class="readout">
+      <h2>Latency</h2>
+      <p class="value"><span id="t-latency">–</span><small>ms</small></p>
+      <p class="sub" id="t-latency-sub">Recording to screen</p>
+    </article>
+    <article class="readout">
+      <h2>Dropped frames</h2>
+      <p class="value"><span id="t-dropped">–</span></p>
+      <p class="sub" id="t-dropped-sub">Lost before processing</p>
+    </article>
+  </section>
+
+  <main>
+    <div class="charts" id="graphs" tabindex="-1">
+      <section class="panel chart chart-spectrum">
+        <div class="chart-head">
+          <div>
+            <h2>Range spectrum: what is at each distance?</h2>
+            <p>Each bump is an echo. A target counts when a <b>dot</b> (one per range cell) rises above the <b>threshold</b>.</p>
+          </div>
+          <ul class="legend">
+            <li><i class="line spectrum"></i>Echo strength</li>
+            <li><i class="line threshold"></i>Threshold</li>
+            <li><i class="dot"></i>Range cell</li>
+            <li><i class="tri"></i>Detected</li>
+            <li><i class="tick"></i>True position (sim only)</li>
+          </ul>
+        </div>
+        <div class="plot"><canvas id="spectrum" role="img" aria-label="Echo strength against distance. Detected targets are also listed in the Targets table."></canvas></div>
+      </section>
+
+      <section class="panel chart chart-waterfall">
+        <div class="chart-head">
+          <div>
+            <h2>Range history (waterfall)</h2>
+            <p>Newest on top. Still targets draw stripes; moving ones slant.</p>
+          </div>
+          <div class="scale"><span>0</span><canvas id="ramp" width="100" height="8" aria-hidden="true"></canvas><span>45+ dB above noise</span></div>
+        </div>
+        <div class="plot"><canvas id="waterfall" role="img" aria-label="Echo strength against distance over the last 12 seconds"></canvas></div>
+      </section>
+
+      <section class="panel chart chart-beat">
+        <div class="chart-head">
+          <div>
+            <h2>Raw beat signal</h2>
+            <p>What the converter records. Farther targets wiggle faster.</p>
+          </div>
+          <ul class="legend">
+            <li><i class="line spectrum"></i>One chirp (raw)</li>
+            <li><i class="line average"></i><span id="avg-label">Average of the chirps</span></li>
+          </ul>
+        </div>
+        <div class="plot"><canvas id="beat" role="img" aria-label="Voltage against time within one chirp"></canvas></div>
+      </section>
+    </div>
+
+    <aside>
+      <section class="panel controls">
+        <h2>Simulation controls</h2>
+        <p class="hint">They change the pretend world and the processing, never hardware.</p>
+        <fieldset id="sim-controls">
+          <label class="field">What is in front of the radar?
+            <select id="scene">
+              <option value="single">One reflector</option>
+              <option value="pair">Two equal reflectors</option>
+              <option value="moving">One moving reflector</option>
+              <option value="three">Three reflectors</option>
+              <option value="empty">Nothing (noise only)</option>
+            </select>
+          </label>
+          <p class="hint" id="scene-note"></p>
+          <label class="slider" id="distance-row"><span>Distance</span><output id="distance-out"></output>
+            <input id="distance_m" type="range" min="3" max="40" step="0.1" value="12">
+          </label>
+          <label class="slider" id="separation-row"><span>Spacing apart</span><output id="separation-out"></output>
+            <input id="separation_m" type="range" min="0.5" max="5" step="0.1" value="2.5">
+          </label>
+          <label class="slider"><span>Noise per sample</span><output id="noise-out"></output>
+            <input id="noise_mv" type="range" min="1" max="100" step="1" value="10">
+          </label>
+          <fieldset class="seg" id="sweep-seg">
+            <legend>Sweep to simulate</legend>
+            <label><input type="radio" name="sweep" value="115" checked><span><b>115 MHz</b><small>Radiated design case</small></span></label>
+            <label><input type="radio" name="sweep" value="150"><span><b>150 MHz</b><small>Sim and cable / dummy load only</small></span></label>
+          </fieldset>
+        </fieldset>
+        <fieldset class="seg" id="window-seg">
+          <legend>Window (how data is shaped)</legend>
+          <label><input type="radio" name="window" value="hann" checked><span><b>Hann</b><small>Normal detection</small></span></label>
+          <label><input type="radio" name="window" value="rect"><span><b>Rectangular</b><small>Two-target test only</small></span></label>
+        </fieldset>
+        <div class="actions">
+          <button type="button" id="freeze" aria-pressed="false">Freeze screen</button>
+          <button type="button" id="drop">Simulate 5 lost frames</button>
+        </div>
+      </section>
+
+      <section class="panel details">
+        <div class="tabs" role="tablist" aria-label="Details">
+          <button type="button" role="tab" id="tab-found" aria-controls="panel-found" aria-selected="true">Targets</button>
+          <button type="button" role="tab" id="tab-settings" aria-controls="panel-settings" aria-selected="false" tabindex="-1">Settings</button>
+          <button type="button" role="tab" id="tab-goals" aria-controls="panel-goals" aria-selected="false" tabindex="-1">Goals</button>
+          <button type="button" role="tab" id="tab-words" aria-controls="panel-words" aria-selected="false" tabindex="-1">Glossary</button>
+        </div>
+
+        <div class="tabpanel" role="tabpanel" id="panel-found" aria-labelledby="tab-found" tabindex="0">
+          <table>
+            <thead><tr><th>#</th><th>Distance</th><th>SNR</th><th>Beat freq.</th></tr></thead>
+            <tbody id="detections"><tr><td colspan="4">–</td></tr></tbody>
+          </table>
+          <p class="hint" id="truth-note"></p>
+        </div>
+        <div class="tabpanel" role="tabpanel" id="panel-settings" aria-labelledby="tab-settings" tabindex="0" hidden>
+          <dl class="list" id="settings"></dl>
+        </div>
+        <div class="tabpanel" role="tabpanel" id="panel-goals" aria-labelledby="tab-goals" tabindex="0" hidden>
+          <p class="hint">Targets from decision 002. They are assumptions and have <b>not</b> been demonstrated. A simulation on this PC cannot pass them.</p>
+          <dl class="list" id="targets"></dl>
+        </div>
+        <div class="tabpanel" role="tabpanel" id="panel-words" aria-labelledby="tab-words" tabindex="0" hidden>
+          <dl class="glossary">
+            <dt>FMCW</dt><dd>The radar sends a tone whose frequency rises steadily, and listens while sending.</dd>
+            <dt>Chirp / sweep</dt><dd>One rise in frequency. Its width is the bandwidth.</dd>
+            <dt>Beat signal</dt><dd>The difference between what is sent now and the returning echo. A farther object gives a higher beat frequency.</dd>
+            <dt>Range spectrum</dt><dd>The beat signal sorted by frequency (an FFT), relabelled as distance.</dd>
+            <dt>Range cell</dt><dd>The spacing of the distance grid, c/(2B). It is not the same as the closest two targets that can be told apart.</dd>
+            <dt>Window</dt><dd>A weighting of each chirp. Hann hides false side bumps but widens peaks. Rectangular gives narrower peaks with bigger side bumps.</dd>
+            <dt>Frame</dt><dd>A group of chirps processed into one screen update.</dd>
+            <dt>dB, dBV</dt><dd>A ratio scale: +20 dB is 10 times the voltage. dBV compares with 1 volt peak.</dd>
+            <dt>SNR</dt><dd>Echo power compared with noise power, after processing.</dd>
+            <dt>Threshold</dt><dd>The height an echo must pass to count. It is set from the measured noise.</dd>
+            <dt>False alarm</dt><dd>Noise passing the threshold and looking like a target.</dd>
+          </dl>
+        </div>
+      </section>
+    </aside>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
