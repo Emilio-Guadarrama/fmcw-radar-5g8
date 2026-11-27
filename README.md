@@ -4,6 +4,10 @@ Low-cost 5.8 GHz FMCW radar. Chirp from a PLL (ADF4159) plus VCO, ESP32-S3 for c
 
 **Status:** set-up (2026-11). No hardware built yet. All numbers below are design targets, not measurements.
 
+## New here? Start with the learning guide
+
+This is a learning project: we build it to learn how radar works, and we document it so others can learn with us. [docs/learn/](docs/learn/README.md) explains the whole project in plain language, with analogies, diagrams and a glossary. For an interactive version with sliders, open [docs/learn/radar-guide.html](docs/learn/radar-guide.html) in a web browser after downloading the repository.
+
 ## Targets (assumptions, to be validated in simulation)
 
 | Parameter | Target |
@@ -19,7 +23,7 @@ Low-cost 5.8 GHz FMCW radar. Chirp from a PLL (ADF4159) plus VCO, ESP32-S3 for c
 ## Layout
 
 ```
-docs/       charter, requirements, decisions, gate reviews
+docs/       charter, requirements, decisions, gate reviews, learning guide (docs/learn/)
 sim/        Python signal chain, PLL loop filter, openEMS
 hardware/   Altium project + review exports (netlist, BOM, Gerbers)
 firmware/   ESP32-S3 firmware

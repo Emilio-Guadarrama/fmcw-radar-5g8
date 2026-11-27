@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Interactive learning guide. Open this file in any web browser. No install needed. -->
+<title>SPECULA-1 Radar Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column of "lab notebook" sections; diagrams break out wider; numbers in mono. */
+:root{
+  --bg:#f3f6f9; --paper:#ffffff; --ink:#15233a; --muted:#566377; --line:#d5dde7;
+  --tx:#2357c2; --rx:#c03b74; --beat:#b07a06; --ok:#2b8a57; --warn:#b5531f;
+  --tint:#e8eef7;
+  --display:"Space Grotesk",ui-sans-serif,system-ui,sans-serif;
+  --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1621; --paper:#16202e; --ink:#e3e9f2; --muted:#9aa7b9; --line:#2b394c;
+  --tx:#6f9cf5; --rx:#ef7fae; --beat:#e3b341; --ok:#5cc98d; --warn:#f0925c; --tint:#1c2a3d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1621; --paper:#16202e; --ink:#e3e9f2; --muted:#9aa7b9; --line:#2b394c;
+  --tx:#6f9cf5; --rx:#ef7fae; --beat:#e3b341; --ok:#5cc98d; --warn:#f0925c; --tint:#1c2a3d; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:860px;margin:0 auto;padding-block:40px 80px;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,5vw,3rem)}
+h2{font-size:1.6rem}
+h3{font-size:1.1rem}
+p{margin:0;max-width:68ch}
+section{display:flex;flex-direction:column;gap:16px;min-width:0}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.15rem;color:var(--muted)}
+.mono,code{font-family:var(--mono);font-size:.92em}
+code{background:var(--tint);padding:1px 5px;border-radius:4px}
+.tx{color:var(--tx);font-weight:600}.rx{color:var(--rx);font-weight:600}.bt{color:var(--beat);font-weight:600}
+.analogy{border-left:3px solid var(--beat);padding:10px 16px;background:var(--tint);border-radius:0 8px 8px 0}
+.analogy b{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--beat);display:block}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.scroll{overflow-x:auto}
+svg text{font-family:var(--body)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.term{display:flex;flex-direction:column;gap:4px}
+.term dt{font-family:var(--mono);font-weight:600}
+.term dd{margin:0;color:var(--muted)}
+dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px 28px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.readout div{border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.readout span{display:block;font-size:.78rem;color:var(--muted)}
+.readout strong{font-family:var(--mono);font-size:1.15rem;font-variant-numeric:tabular-nums}
+.controls{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+.controls label{display:flex;gap:10px;align-items:center;font-size:.95rem}
+input[type=range]{width:220px;max-width:60vw;accent-color:var(--tx)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{font:inherit;font-size:.9rem;background:transparent;color:var(--ink);border:0;padding:5px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--tx);color:var(--paper)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--beat);outline-offset:2px}
+.gates{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.gate{border:1px solid var(--line);border-radius:8px;padding:8px;font-size:.82rem;display:flex;flex-direction:column;gap:4px;min-width:0}
+.gate strong{font-family:var(--mono);font-size:1rem}
+.gate.now{border-color:var(--beat);background:var(--tint)}
+.gate em{font-style:normal;font-size:.72rem;font-family:var(--mono);color:var(--beat)}
+@media (max-width:640px){.gates{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pill{display:inline-block;font-family:var(--mono);font-size:.72rem;padding:1px 8px;border-radius:999px;border:1px solid currentColor}
+.pill.ok{color:var(--ok)}.pill.warn{color:var(--warn)}.pill.mut{color:var(--muted)}
+ul,ol{margin:0;padding-left:1.3em;max-width:68ch;display:flex;flex-direction:column;gap:6px}
+pre{background:var(--tint);padding:12px;border-radius:8px;overflow-x:auto;margin:0;font-family:var(--mono);font-size:.85rem}
+hr{border:0;border-top:1px solid var(--line);margin:0}
+body{margin:0}
+</style>
+</head>
+<body>
+
+<main>
+<header style="display:flex;flex-direction:column;gap:14px">
+  <div class="eyebrow">Learning guide · fmcw-radar-5g8 · status Nov 2026</div>
+  <h1>SPECULA-1, explained simply</h1>
+  <p class="lede">A small, cheap radar that measures how far away things are, using radio waves around 5.8 GHz. This page walks through how it works, what is in the repository, and where the project stands, with an analogy for every hard word.</p>
+  <p style="font-size:.9rem;color:var(--muted)">This guide is for learning. The numbers are design targets (assumptions) or calculated values from the simulation, not measurements. The source of truth is <a href="../requirements.md">docs/requirements.md</a> and the decisions in <a href="../decisions/">docs/decisions/</a>. Interactive charts are simplified illustrations, not the project's simulation.</p>
+  <div class="analogy"><b>The whole project in one sentence</b>It works like a bat. A bat squeaks and listens for the echo. This radar "squeaks" a radio tone whose pitch slides upward, listens for the echo, and works out the distance from how far the echo's pitch lags behind.</div>
+</header>
+
+<section>
+  <div class="eyebrow">Part 1 · The core idea</div>
+  <h2>FMCW: the sliding whistle trick</h2>
+  <p><strong>FMCW</strong> stands for <em>Frequency-Modulated Continuous Wave</em>. In plain words: the radar transmits <strong>all the time</strong> (continuous wave), and it keeps <strong>changing its frequency</strong> (frequency-modulated) in a straight upward ramp called a <strong>chirp</strong>.</p>
+  <div class="analogy"><b>Analogy: singing in a canyon</b>Imagine you sing a note that rises smoothly from low to high, and you keep sliding. Your voice bounces off a cliff and comes back a moment later. When it returns, you are already singing a higher note than the echo. The difference between the note you are singing and the note you hear is bigger when the cliff is further away. That difference is the <span class="bt">beat frequency</span>, and it is the number the radar measures.</div>
+
+  <div class="panel">
+    <h3>Try it: move the target</h3>
+    <div class="controls">
+      <label for="dist">Target distance <input id="dist" type="range" min="3" max="45" step="0.5" value="20"> <span class="mono" id="distv">20 m</span></label>
+      <div class="seg" role="group" aria-label="Sweep">
+        <button type="button" id="b115" aria-pressed="true">115 MHz sweep</button>
+        <button type="button" id="b150" aria-pressed="false">150 MHz sweep</button>
+      </div>
+    </div>
+    <div class="scroll">
+      <svg id="chirp" viewBox="0 0 640 300" style="width:100%;min-width:520px;display:block" role="img" aria-label="Transmitted and received chirps over time, with the beat frequency gap">
+        <line x1="60" y1="260" x2="600" y2="260" stroke="var(--muted)" stroke-width="1"/>
+        <line x1="60" y1="260" x2="60" y2="30" stroke="var(--muted)" stroke-width="1"/>
+        <text x="600" y="282" text-anchor="end" font-size="12" fill="var(--muted)">time →</text>
+        <text x="20" y="40" font-size="12" fill="var(--muted)" transform="rotate(-90 20 40)" text-anchor="end">frequency →</text>
+        <text x="56" y="54" text-anchor="end" font-size="11" fill="var(--muted)" id="ftop">5.845</text>
+        <text x="56" y="254" text-anchor="end" font-size="11" fill="var(--muted)" id="fbot">5.730</text>
+        <text x="190" y="282" text-anchor="middle" font-size="11" fill="var(--muted)">1 chirp = 1 ms</text>
+        <path id="txp" fill="none" stroke="var(--tx)" stroke-width="3"/>
+        <path id="rxp" fill="none" stroke="var(--rx)" stroke-width="3" stroke-dasharray="7 5"/>
+        <line id="gap" stroke="var(--beat)" stroke-width="3"/>
+        <text id="gapt" font-size="13" font-weight="600" fill="var(--beat)">beat</text>
+        <rect x="420" y="40" width="12" height="4" fill="var(--tx)"/><text x="438" y="46" font-size="12" fill="var(--ink)">sent (TX)</text>
+        <rect x="510" y="40" width="12" height="4" fill="var(--rx)"/><text x="528" y="46" font-size="12" fill="var(--ink)">echo (RX)</text>
+      </svg>
+    </div>
+    <div class="readout">
+      <div><span>Echo travel time</span><strong id="r_tau">–</strong></div>
+      <div><span>Beat frequency</span><strong id="r_fb">–</strong></div>
+      <div><span>Range bin (c/2B)</span><strong id="r_bin">–</strong></div>
+      <div><span>Lands in FFT bin #</span><strong id="r_idx">–</strong></div>
+    </div>
+    <p style="font-size:.85rem;color:var(--muted)">The gap between the lines is exaggerated so you can see it. In reality the echo from 30 m comes back after only 200 nanoseconds, which is 0.02 % of the 1 ms chirp.</p>
+  </div>
+
+  <h3>The one formula that matters</h3>
+  <pre>beat frequency  f_b = 2 · R · S / c
+
+R = distance to the target (m)
+S = slope = how fast the pitch climbs = B / T = 115 MHz / 1 ms = 1.15 × 10¹¹ Hz per second
+c = speed of light ≈ 300 000 km/s
+2 = the wave goes there AND back</pre>
+  <p>Plug in 30 m and you get about <span class="mono bt">23 kHz</span>. That is a sound-like frequency, slow enough for a cheap computer chip to record. This is the magic of FMCW: a 5.8 <em>billion</em> Hz radio problem turns into a 23 <em>thousand</em> Hz audio-like problem.</p>
+</section>
+
+<section>
+  <div class="eyebrow">Part 2 · The hardware chain (planned, not built yet)</div>
+  <h2>From radio wave to a number on the screen</h2>
+  <p>Every box below is a part on the board the team will design. Follow the arrows: the top row makes the chirp, the middle row catches the echo, the bottom row turns it into data.</p>
+  <div class="panel scroll">
+    <svg viewBox="0 0 860 410" style="width:100%;min-width:760px;display:block" role="img" aria-label="Block diagram of the radar signal chain">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker>
+        <marker id="aht" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--tx)"/></marker>
+        <marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--rx)"/></marker>
+      </defs>
+      <g font-size="13">
+        <!-- row labels -->
+        <text x="20" y="20" font-size="11" fill="var(--tx)" font-family="var(--mono)">1 · MAKE THE CHIRP</text>
+        <text x="20" y="190" font-size="11" fill="var(--rx)" font-family="var(--mono)">2 · CATCH AND COMPARE THE ECHO</text>
+        <text x="20" y="320" font-size="11" fill="var(--beat)" font-family="var(--mono)">3 · RECORD AND CALCULATE</text>
+        <!-- row 1 -->
+        <g><rect x="20" y="30" width="135" height="58" rx="8" fill="var(--paper)" stroke="var(--tx)"/><text x="87" y="54" text-anchor="middle" font-weight="600" fill="var(--ink)">PLL · ADF4159</text><text x="87" y="73" text-anchor="middle" font-size="11" fill="var(--muted)">the conductor</text></g>
+        <g><rect x="175" y="30" width="135" height="58" rx="8" fill="var(--paper)" stroke="var(--tx)"/><text x="242" y="54" text-anchor="middle" font-weight="600" fill="var(--ink)">VCO · HMC431</text><text x="242" y="73" text-anchor="middle" font-size="11" fill="var(--muted)">the singer</text></g>
+        <g><rect x="330" y="30" width="135" height="58" rx="8" fill="var(--paper)" stroke="var(--tx)"/><text x="397" y="54" text-anchor="middle" font-weight="600" fill="var(--ink)">Splitter</text><text x="397" y="73" text-anchor="middle" font-size="11" fill="var(--muted)">Y-cable for signals</text></g>
+        <g><rect x="485" y="30" width="135" height="58" rx="8" fill="var(--paper)" stroke="var(--tx)"/><text x="552" y="54" text-anchor="middle" font-weight="600" fill="var(--ink)">TX antenna</text><text x="552" y="73" text-anchor="middle" font-size="11" fill="var(--muted)">the mouth</text></g>
+        <line x1="155" y1="59" x2="173" y2="59" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <line x1="310" y1="59" x2="328" y2="59" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <line x1="465" y1="59" x2="483" y2="59" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <!-- target -->
+        <g><rect x="700" y="115" width="140" height="58" rx="8" fill="var(--tint)" stroke="var(--line)" stroke-dasharray="4 3"/><text x="770" y="139" text-anchor="middle" font-weight="600" fill="var(--ink)">Target</text><text x="770" y="158" text-anchor="middle" font-size="11" fill="var(--muted)">corner reflector, 3–30 m</text></g>
+        <path d="M620 59 Q700 60 730 113" fill="none" stroke="var(--tx)" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#aht)"/>
+        <path d="M730 175 Q700 228 622 229" fill="none" stroke="var(--rx)" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahr)"/>
+        <text x="690" y="80" font-size="11" fill="var(--tx)">wave out</text>
+        <text x="672" y="222" font-size="11" fill="var(--rx)">echo back</text>
+        <!-- row 2 -->
+        <g><rect x="485" y="200" width="135" height="58" rx="8" fill="var(--paper)" stroke="var(--rx)"/><text x="552" y="224" text-anchor="middle" font-weight="600" fill="var(--ink)">RX antenna</text><text x="552" y="243" text-anchor="middle" font-size="11" fill="var(--muted)">the ear</text></g>
+        <g><rect x="330" y="200" width="135" height="58" rx="8" fill="var(--paper)" stroke="var(--rx)"/><text x="397" y="224" text-anchor="middle" font-weight="600" fill="var(--ink)">LNA · HMC717</text><text x="397" y="243" text-anchor="middle" font-size="11" fill="var(--muted)">the hearing aid</text></g>
+        <g><rect x="175" y="200" width="135" height="58" rx="8" fill="var(--paper)" stroke="var(--rx)"/><text x="242" y="224" text-anchor="middle" font-weight="600" fill="var(--ink)">Mixer · HMC219</text><text x="242" y="243" text-anchor="middle" font-size="11" fill="var(--muted)">the comparer</text></g>
+        <g><rect x="20" y="200" width="135" height="58" rx="8" fill="var(--paper)" stroke="var(--rx)"/><text x="87" y="224" text-anchor="middle" font-weight="600" fill="var(--ink)">Amp + filter</text><text x="87" y="243" text-anchor="middle" font-size="11" fill="var(--muted)">volume + bouncer</text></g>
+        <line x1="485" y1="229" x2="467" y2="229" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <line x1="330" y1="229" x2="312" y2="229" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <line x1="175" y1="229" x2="157" y2="229" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <!-- LO path -->
+        <path d="M397 88 V140 H262 V198" fill="none" stroke="var(--tx)" stroke-width="1.5" marker-end="url(#aht)"/>
+        <text x="272" y="133" font-size="11" fill="var(--tx)">copy of what we're "singing" (LO)</text>
+        <!-- row 3 -->
+        <g><rect x="20" y="330" width="135" height="58" rx="8" fill="var(--paper)" stroke="var(--beat)"/><text x="87" y="354" text-anchor="middle" font-weight="600" fill="var(--ink)">ADC</text><text x="87" y="373" text-anchor="middle" font-size="11" fill="var(--muted)">the microphone recorder</text></g>
+        <g><rect x="175" y="330" width="135" height="58" rx="8" fill="var(--paper)" stroke="var(--beat)"/><text x="242" y="354" text-anchor="middle" font-weight="600" fill="var(--ink)">ESP32-S3</text><text x="242" y="373" text-anchor="middle" font-size="11" fill="var(--muted)">the courier</text></g>
+        <g><rect x="345" y="330" width="160" height="58" rx="8" fill="var(--paper)" stroke="var(--beat)"/><text x="425" y="354" text-anchor="middle" font-weight="600" fill="var(--ink)">PC · Python FFT</text><text x="425" y="373" text-anchor="middle" font-size="11" fill="var(--muted)">the translator</text></g>
+        <line x1="87" y1="258" x2="87" y2="328" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <text x="95" y="298" font-size="11" fill="var(--bt, var(--beat))">~23 kHz beat tone</text>
+        <line x1="155" y1="359" x2="173" y2="359" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <line x1="310" y1="359" x2="343" y2="359" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+        <text x="314" y="351" font-size="11" fill="var(--muted)">USB</text>
+        <text x="520" y="354" font-size="12" fill="var(--ink)">→ "target at 12.4 m"</text>
+      </g>
+    </svg>
+  </div>
+
+  <table>
+    <thead><tr><th>Part</th><th>What it really does</th><th>Analogy</th></tr></thead>
+    <tbody>
+      <tr><td><strong>PLL</strong> (Phase-Locked Loop), ADF4159</td><td>Watches the VCO and constantly corrects it so the frequency ramp is a perfectly straight line. Uses a steady crystal clock (TCXO) as its reference.</td><td>A conductor with a metronome keeping the singer exactly on tempo.</td></tr>
+      <tr><td><strong>VCO</strong> (Voltage-Controlled Oscillator), HMC431</td><td>Produces the 5.7–5.8 GHz radio wave. More control voltage → higher frequency.</td><td>The singer. On its own it drifts; the conductor keeps it honest.</td></tr>
+      <tr><td><strong>Splitter</strong> (Wilkinson divider)</td><td>Sends part of the chirp to the antenna and keeps a copy for the mixer. It is printed directly on the circuit board, so it costs nothing.</td><td>A Y-cable for headphones.</td></tr>
+      <tr><td><strong>Antennas</strong> (TX and RX)</td><td>Turn the electrical signal into radio waves and back. First tests use cheap "duck" antennas, later printed patch antennas.</td><td>Mouth and ear.</td></tr>
+      <tr><td><strong>LNA</strong> (Low-Noise Amplifier), HMC717</td><td>Boosts the faint echo without adding much hiss.</td><td>A hearing aid.</td></tr>
+      <tr><td><strong>Mixer</strong>, HMC219</td><td>Multiplies the echo with the copy of the current chirp. The output is the difference between them: the beat frequency.</td><td>Two tuning forks slightly off-pitch make a slow "wah-wah" sound. The mixer produces that wah-wah.</td></tr>
+      <tr><td><strong>Baseband amp + anti-alias filter</strong></td><td>Makes the beat signal louder and blocks frequencies too high for the ADC to record correctly.</td><td>A volume knob plus a bouncer that stops gatecrashers.</td></tr>
+      <tr><td><strong>ADC</strong> (Analog-to-Digital Converter), ADS8860</td><td>Measures the voltage 100 000 times per second (100 kSPS) and turns it into numbers.</td><td>A microphone recording to a file.</td></tr>
+      <tr><td><strong>ESP32-S3</strong></td><td>A small, cheap microcontroller. Collects the ADC numbers and sends them over USB.</td><td>A courier.</td></tr>
+      <tr><td><strong>Python on a PC</strong></td><td>Runs an FFT on each chirp to find the beat frequency, converts it to distance, and draws it live.</td><td>A translator from "sound" to "meters".</td></tr>
+    </tbody>
+  </table>
+  <p>There is deliberately <strong>no power amplifier</strong> in version 1: low power, indoors, bench first. Estimated parts cost is about <span class="mono">US$134</span> per board.</p>
+</section>
+
+<section>
+  <div class="eyebrow">Part 3 · The software brain</div>
+  <h2>The FFT: a prism for signals</h2>
+  <p>The mixer output is a messy wiggle. If there are three objects, it contains three tones on top of each other. The <strong>FFT</strong> (Fast Fourier Transform) is an algorithm that splits a signal into the tones inside it.</p>
+  <div class="analogy"><b>Analogy: prism or music equalizer</b>A prism splits white light into colors. The bouncing bars on a music equalizer show how much bass, mid and treble is playing. The FFT does the same for the beat signal. Each bar ("bin") is a distance slot, and a tall bar means "something is there".</div>
+  <div class="panel">
+    <h3>Range spectrum for the target from Part 1</h3>
+    <div class="scroll">
+      <svg id="spec" viewBox="0 0 640 200" style="width:100%;min-width:520px;display:block" role="img" aria-label="FFT bars showing a peak at the target distance"></svg>
+    </div>
+    <p style="font-size:.85rem;color:var(--muted)">Ideal simulation: one target, Hann window, no noise. Each bar is one <strong>range bin</strong> about 1.3 m wide at 115 MHz. Move the slider in Part 1 and the peak moves.</p>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Part 4 · Resolution</div>
+  <h2>Why "1.3 m" doesn't mean you can see two things 1.3 m apart</h2>
+  <p><strong>Range bin</strong> = <code>c / (2B)</code>. With B = 115 MHz that is <span class="mono">1.30 m</span>. Wider sweep → narrower bins. But each target makes a "hill" in the spectrum, not a thin line, and two hills close together melt into one. The project's simulation found two equal targets need about <span class="mono">2.0 m</span> apart to show up as two peaks, so the official goal is <strong>2.5 m or less</strong>.</p>
+  <div class="analogy"><b>Analogy: two car headlights at night</b>Far away, a car's two headlights blur into one blob. As it gets closer, you can tell there are two. Resolution is the distance at which "one blob" becomes "two lights".</div>
+  <div class="panel">
+    <h3>Try it: two targets near 20 m</h3>
+    <div class="controls">
+      <label for="sep">Separation <input id="sep" type="range" min="0.5" max="4" step="0.1" value="2.5"> <span class="mono" id="sepv">2.5 m</span></label>
+      <div class="seg" role="group" aria-label="Window">
+        <button type="button" id="wr" aria-pressed="true">Rectangular</button>
+        <button type="button" id="wh" aria-pressed="false">Hann</button>
+      </div>
+    </div>
+    <div class="scroll"><svg id="res" viewBox="0 0 640 220" style="width:100%;min-width:520px;display:block" role="img" aria-label="Spectrum of two nearby targets"></svg></div>
+    <p style="font-size:.85rem;color:var(--muted)">Illustration only: 115 MHz, ideal, two equal echoes in phase. The project's real test checks 72 different phase combinations, which is why its numbers are a bit stricter.</p>
+  </div>
+  <p>The <strong>window</strong> is a fade-in/fade-out applied to each chirp before the FFT. <strong>Rectangular</strong> (no fade) gives sharp hills but noisy "side lobes" that can hide a weak target next to a strong one. <strong>Hann</strong> (smooth fade) gives clean, wider hills. The project uses rectangular only for the two-target test and Hann for everything else.</p>
+  <div class="analogy"><b>Analogy: camera focus</b>Rectangular is a sharp lens with lens flare. Hann is a slightly soft lens with no flare.</div>
+</section>
+
+<section>
+  <div class="eyebrow">Part 5 · The legal question</div>
+  <h2>Why 115 MHz and not 150 MHz</h2>
+  <p>Radio frequencies are like lanes on a public highway: you need permission to drive in most of them. Mexico's regulator lists <span class="mono">5725–5850 MHz</span> as "free spectrum". The original plan swept up to 5875 MHz, 25 MHz outside the listed lane. So the team chose <a href="../decisions/001-sweep.md">decision 001</a>:</p>
+  <div class="panel scroll">
+    <svg viewBox="0 0 640 170" style="width:100%;min-width:520px;display:block" role="img" aria-label="Frequency band map">
+      <line x1="40" y1="140" x2="600" y2="140" stroke="var(--muted)"/>
+      <!-- scale: 5715 -> 40, 5885 -> 600 ; px per MHz = 560/170 = 3.294 -->
+      <g font-size="11" fill="var(--muted)" text-anchor="middle" font-family="var(--mono)">
+        <text x="73" y="158">5725</text><text x="90" y="128" fill="var(--muted)">5730</text><text x="485" y="128">5845</text><text x="501" y="158">5850</text><text x="567" y="158">5875</text>
+      </g>
+      <rect x="73" y="20" width="494" height="22" rx="4" fill="none" stroke="var(--warn)" stroke-dasharray="5 4"/>
+      <text x="80" y="36" font-size="12" fill="var(--warn)">Option A · 150 MHz: simulation and cables only</text>
+      <rect x="73" y="54" width="428" height="22" rx="4" fill="var(--tint)" stroke="var(--muted)"/>
+      <text x="80" y="70" font-size="12" fill="var(--ink)">Listed free band 5725–5850 (no safety margin)</text>
+      <rect x="90" y="88" width="395" height="22" rx="4" fill="var(--tx)" opacity=".9"/>
+      <text x="98" y="104" font-size="12" fill="var(--paper)" font-weight="600">Option C · 115 MHz: chosen design case</text>
+      <line x1="73" y1="135" x2="73" y2="145" stroke="var(--muted)"/><line x1="501" y1="135" x2="501" y2="145" stroke="var(--muted)"/><line x1="567" y1="135" x2="567" y2="145" stroke="var(--muted)"/>
+    </svg>
+  </div>
+  <ul>
+    <li><strong>5 MHz guard</strong> on each edge so the real signal, which is never perfect, doesn't spill out of the lane.</li>
+    <li>Cost: range bin grows from 1.0 m to 1.3 m.</li>
+    <li><strong>Nothing has been cleared to transmit.</strong> Open item <code>M-01</code>: it is still unconfirmed whether an FMCW radar qualifies for that free band. A university project is not an exemption. Until this is resolved, tests use only cables and a <strong>dummy load</strong> (a plug that safely swallows the signal instead of radiating it).</li>
+  </ul>
+</section>
+
+<section>
+  <div class="eyebrow">Part 6 · Goals</div>
+  <h2>What "success" means (decision 002, "Balanced")</h2>
+  <p>All of these are <strong>targets</strong>, not proven results. No hardware exists yet.</p>
+  <table>
+    <thead><tr><th>Goal</th><th>Value</th><th>In plain words</th></tr></thead>
+    <tbody>
+      <tr><td>Range</td><td class="mono">3–30 m</td><td>Works for objects between 3 and 30 m away, indoors.</td></tr>
+      <tr><td>Two-target resolution</td><td class="mono">≤ 2.5 m</td><td>Two equal objects 2.5 m apart show as two peaks.</td></tr>
+      <tr><td>Accuracy</td><td class="mono">≤ 0.20 m, 95 %</td><td>Distance is within 20 cm in 95 of 100 tries, when the echo is clear (SNR ≥ 20 dB).</td></tr>
+      <tr><td>Detection</td><td class="mono">Pd ≥ 0.90 at Pfa 1e-4</td><td>Finds a real target at least 90 % of the time, and raises a false alarm in at most 1 of 10 000 empty slots.</td></tr>
+      <tr><td>Update rate</td><td class="mono">≥ 10 Hz</td><td>At least 10 fresh readings per second (16 chirps averaged per frame).</td></tr>
+      <tr><td>Latency</td><td class="mono">≤ 200 ms</td><td>The screen lags reality by at most a fifth of a second.</td></tr>
+      <tr><td>Reference target</td><td class="mono">15 cm corner reflector</td><td>A three-sided metal corner that bounces radio straight back, like a bike reflector does with light.</td></tr>
+    </tbody>
+  </table>
+  <div class="analogy"><b>Analogy: smoke alarm for Pd and Pfa</b><strong>Pd</strong> (probability of detection) is how often the alarm rings when there really is smoke. <strong>Pfa</strong> (probability of false alarm) is how often it rings when you are only making toast. Set the threshold lower and you catch more real fires, but you also get more false alarms. The live display puts its threshold 11 dB above the measured noise to hit Pfa = 1e-4.</div>
+</section>
+
+<section>
+  <div class="eyebrow">Part 7 · The repository</div>
+  <h2>What's in each folder</h2>
+  <table>
+    <thead><tr><th>Folder</th><th>Contents</th><th>State</th></tr></thead>
+    <tbody>
+      <tr><td><code>docs/</code></td><td>Charter (rules and goals), requirements R-01 to R-25, decisions 001 and 002, the Gate 0 review.</td><td><span class="pill ok">active</span></td></tr>
+      <tr><td><code>sim/</code></td><td><code>fmcw.py</code>: math model of chirp, echo, noise, ADC and FFT. <code>run_sim.py</code> makes the plots in <code>sim/out/</code>. <code>test_fmcw.py</code> checks the math with <code>pytest</code>.</td><td><span class="pill ok">working</span></td></tr>
+      <tr><td><code>software/</code></td><td>A live radar display in the browser, fed by <strong>simulated</strong> data. Has a spectrum, a waterfall (history over time), raw signal, target table, glossary. Can build a Windows <code>.exe</code>.</td><td><span class="pill ok">preliminary</span></td></tr>
+      <tr><td><code>bom/</code>, <code>hardware/exports/bom.csv</code></td><td>Bill of materials: parts list with prices.</td><td><span class="pill warn">has known inconsistencies</span></td></tr>
+      <tr><td><code>hardware/</code></td><td>Will hold the Altium circuit board design.</td><td><span class="pill mut">empty</span></td></tr>
+      <tr><td><code>firmware/</code></td><td>Will hold the ESP32-S3 program.</td><td><span class="pill mut">empty</span></td></tr>
+      <tr><td><code>tests/</code></td><td>Will hold bench test procedures and measurement logs.</td><td><span class="pill mut">empty</span></td></tr>
+      <tr><td><code>.claude/agents/</code></td><td>Six AI helper roles (architect, simulator, hardware, inspector, firmware, validation) that mirror the human team roles.</td><td><span class="pill ok">set up</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>How the live display software is organized</h3>
+  <pre>simulated.py  →  fake echoes from a pretend scene (uses sim/fmcw.py)
+     ↓  (later: an ESP32 USB source plugs in here instead, via source.py)
+processing.py →  average 16 chirps → FFT → estimate noise → threshold → list of targets
+     ↓
+engine.py + server.py → loop that runs it, tiny web server on 127.0.0.1:8765
+     ↓
+web/app.js    →  draws the graphs in your browser</pre>
+  <p>The clever part: <code>source.py</code> defines a "plug shape". The simulator fits it today; when the real hardware exists, someone writes a USB version with the same shape and the rest of the software doesn't change. Like a phone charger port: swap the charger, keep the phone.</p>
+</section>
+
+<section>
+  <div class="eyebrow">Part 8 · Process</div>
+  <h2>The gates: a checklist with seven doors</h2>
+  <p>The owner (Emilio) must approve each gate before work moves on. Nothing is ordered, flashed or radiated without his explicit yes.</p>
+  <div class="gates">
+    <div class="gate now"><strong>G0</strong>Spec and requirements<em>waiting for approval</em></div>
+    <div class="gate"><strong>G1</strong>Simulation proves the numbers</div>
+    <div class="gate"><strong>G2</strong>Architecture, BOM, tools</div>
+    <div class="gate"><strong>G3</strong>Schematic reviewed</div>
+    <div class="gate"><strong>G4</strong>Layout reviewed, order PCBs</div>
+    <div class="gate"><strong>G5</strong>Bring-up on the bench</div>
+    <div class="gate"><strong>G6</strong>Measured demo</div>
+  </div>
+  <p><strong>Where it stands (Nov 27, 2026):</strong> Gate 0 is delivered and pending approval. The biggest open items for Gate 1 are a <strong>link budget</strong> (a full "how much signal survives the round trip" calculation, M-06), saved tests for the resolution, accuracy and detection goals, and modeling real-world problems such as <strong>leakage</strong> (the TX antenna "shouting" straight into the RX antenna), <strong>clutter</strong> (walls and furniture echoing), and <strong>phase noise</strong> (the singer's voice wobbling).</p>
+</section>
+
+<section>
+  <div class="eyebrow">Part 9 · House rules</div>
+  <h2>How to contribute without breaking anything</h2>
+  <ol>
+    <li>Read <code>docs/charter.md</code> first.</li>
+    <li>Label every number as <strong>datasheet</strong>, <strong>calculated</strong>, <strong>measured</strong> or <strong>assumption</strong>, always with units. Never invent a spec or price.</li>
+    <li>Keep simulation, bench tests and live radiation clearly separate. Nothing gets radiated yet.</li>
+    <li>Decisions go in <code>docs/decisions/NNN-title.md</code>; gate reviews in <code>docs/gates/Gn.md</code>.</li>
+    <li>Python 3.11+, <code>pytest</code> tests for every module, formatted with <code>ruff</code>. Small commits, imperative messages ("Add X", not "Added X").</li>
+    <li>No AI attribution lines in commits. Link datasheets; don't commit the PDFs.</li>
+  </ol>
+  <h3>Run it yourself (PowerShell, from the repo folder)</h3>
+  <pre>uv venv --python 3.13 .venv
+uv pip install --python .venv -r sim/requirements.txt
+.venv\Scripts\python.exe -m pytest sim software -q
+.venv\Scripts\python.exe software/run_display.py</pre>
+</section>
+
+<section>
+  <div class="eyebrow">Glossary</div>
+  <h2>Every hard word, one line each</h2>
+  <dl>
+    <div class="term"><dt>GHz / MHz / kHz</dt><dd>Billions / millions / thousands of vibrations per second.</dd></div>
+    <div class="term"><dt>Chirp</dt><dd>One sweep of rising frequency, here 1 ms long.</dd></div>
+    <div class="term"><dt>Sweep bandwidth (B)</dt><dd>How far the chirp climbs: 115 MHz. Wider = finer distance detail.</dd></div>
+    <div class="term"><dt>Slope (S)</dt><dd>How fast it climbs: B divided by chirp time.</dd></div>
+    <div class="term"><dt>Beat frequency</dt><dd>The difference between what's sent now and the echo. Proportional to distance.</dd></div>
+    <div class="term"><dt>TX / RX</dt><dd>Transmit / receive.</dd></div>
+    <div class="term"><dt>LO (local oscillator)</dt><dd>The copy of the chirp fed to the mixer for comparison.</dd></div>
+    <div class="term"><dt>Baseband</dt><dd>The slow signal after mixing (kHz), easy to record.</dd></div>
+    <div class="term"><dt>Sample rate (kSPS)</dt><dd>Thousand samples per second the ADC takes.</dd></div>
+    <div class="term"><dt>Nyquist / aliasing</dt><dd>You can only record tones up to half the sample rate. Higher ones disguise themselves as lower ones, like wagon wheels spinning backwards in films.</dd></div>
+    <div class="term"><dt>Range bin</dt><dd>One distance slot in the FFT output, c/(2B) wide.</dd></div>
+    <div class="term"><dt>Window (Hann, rectangular)</dt><dd>Fade applied before the FFT; trades sharpness for cleanliness.</dd></div>
+    <div class="term"><dt>Side lobes</dt><dd>Small fake bumps beside a real peak.</dd></div>
+    <div class="term"><dt>SNR / dB</dt><dd>Signal-to-noise ratio; decibels are a log scale where +10 dB = 10× more power.</dd></div>
+    <div class="term"><dt>Noise floor</dt><dd>The background hiss level everything has to rise above.</dd></div>
+    <div class="term"><dt>Threshold / CFAR</dt><dd>The "loud enough to count" line. CFAR sets it automatically from the measured noise.</dd></div>
+    <div class="term"><dt>Waterfall</dt><dd>A scrolling picture of the spectrum over time.</dd></div>
+    <div class="term"><dt>Doppler</dt><dd>Pitch shift from motion (an ambulance passing). Velocity is a later goal, not v1.</dd></div>
+    <div class="term"><dt>EIRP</dt><dd>Effective radiated power: transmitter power times antenna focus. Legal limits use it.</dd></div>
+    <div class="term"><dt>ISM band</dt><dd>Radio "lanes" set aside for industrial, scientific and medical use, like Wi-Fi's.</dd></div>
+    <div class="term"><dt>Dummy load</dt><dd>A plug that absorbs the signal so nothing is broadcast.</dd></div>
+    <div class="term"><dt>VNA</dt><dd>Vector Network Analyzer: tests how well antennas and cables pass signals. Must reach 6 GHz here.</dd></div>
+    <div class="term"><dt>S11</dt><dd>How much signal bounces back from an antenna instead of going out. Lower is better.</dd></div>
+    <div class="term"><dt>BOM</dt><dd>Bill of materials: the shopping list of parts.</dd></div>
+    <div class="term"><dt>PCB / schematic / layout</dt><dd>Circuit board / the wiring diagram / where parts and copper traces physically go.</dd></div>
+    <div class="term"><dt>Altium / KiCad / openEMS</dt><dd>Board design programs, and an antenna simulator.</dd></div>
+    <div class="term"><dt>Firmware</dt><dd>The program that runs on the ESP32 chip.</dd></div>
+    <div class="term"><dt>Link budget</dt><dd>An accounting sheet of signal gains and losses on the round trip.</dd></div>
+    <div class="term"><dt>Radar cross-section</dt><dd>How "big" an object looks to the radar, in m².</dd></div>
+    <div class="term"><dt>CRT (formerly IFT)</dt><dd>Mexico's telecom regulator.</dd></div>
+  </dl>
+</section>
+</main>
+
+<script>
+(function(){
+  const C=299792458, T=1e-3, FS=100e3, N=100;
+  let B=115e6, F0=5.730e9, R=20;
+  const $=id=>document.getElementById(id);
+  const NS="http://www.w3.org/2000/svg";
+  function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+  function win(name){const w=new Float64Array(N);for(let n=0;n<N;n++)w[n]=name==="hann"?0.5-0.5*Math.cos(2*Math.PI*n/(N-1)):1;return w;}
+  // |DTFT| of sum of unit complex tones at freqs fk, evaluated at f
+  function mag(fks,f,w){let re=0,im=0;for(let n=0;n<N;n++){let sr=0,si=0;for(const fk of fks){const p=2*Math.PI*(fk-f)*n/FS;sr+=Math.cos(p);si+=Math.sin(p);}re+=w[n]*sr;im+=w[n]*si;}return Math.hypot(re,im);}
+
+  function drawChirp(){
+    const S=B/T, fb=2*R*S/C, tau=2*R/C, bin=C/(2*B);
+    $("distv").textContent=R.toFixed(1)+" m";
+    $("ftop").textContent=((F0+B)/1e9).toFixed(3)+" GHz";$("fbot").textContent=(F0/1e9).toFixed(3)+" GHz";
+    $("r_tau").textContent=(tau*1e9).toFixed(0)+" ns";
+    $("r_fb").textContent=(fb/1000).toFixed(2)+" kHz";
+    $("r_bin").textContent=bin.toFixed(2)+" m";
+    $("r_idx").textContent=(fb*T).toFixed(1);
+    const x0=60,P=260,top=50,bot=250,H=bot-top,d=6+(R/45)*60;
+    $("txp").setAttribute("d",`M${x0} ${bot}L${x0+P} ${top}M${x0+P} ${bot}L${x0+2*P} ${top}`);
+    const tail=bot-H*(P-d)/P;
+    $("rxp").setAttribute("d",`M${x0} ${tail}L${x0+d} ${top}M${x0+d} ${bot}L${x0+P+d} ${top}M${x0+P+d} ${bot}L${x0+2*P} ${tail}`);
+    const gx=x0+170, ty=bot-H*170/P, ry=bot-H*(170-d)/P;
+    const g=$("gap");g.setAttribute("x1",gx);g.setAttribute("x2",gx);g.setAttribute("y1",ty);g.setAttribute("y2",ry);
+    const t=$("gapt");t.setAttribute("x",gx+8);t.setAttribute("y",(ty+ry)/2+4);t.textContent="beat = "+(fb/1000).toFixed(1)+" kHz";
+    drawSpec(fb);
+  }
+  function drawSpec(fb){
+    const s=$("spec");s.innerHTML="";const w=win("hann");const bins=50,x0=50,x1=620,yb=160,h=130;
+    const ref=mag([0],0,w);
+    el("line",{x1:x0,y1:yb,x2:x1,y2:yb,stroke:"var(--muted)"},s);
+    const bw=(x1-x0)/bins, bin=C/(2*B);
+    for(let k=0;k<bins;k++){
+      const m=mag([fb],k/T,w)/ref, db=Math.max(-40,20*Math.log10(m+1e-9)), hh=h*(db+40)/40;
+      el("rect",{x:x0+k*bw+1,y:yb-hh,width:bw-2,height:Math.max(hh,0.5),rx:1,fill:hh>h*0.6?"var(--beat)":"var(--tx)",opacity:hh>h*0.6?1:0.45},s);
+    }
+    for(let m=0;m<=60;m+=10){const k=m/bin;if(k>bins)break;const x=x0+k*bw;el("line",{x1:x,y1:yb,x2:x,y2:yb+5,stroke:"var(--muted)"},s);const t=el("text",{x:x,y:yb+18,"text-anchor":"middle","font-size":11,fill:"var(--muted)"},s);t.textContent=m+" m";}
+    const tl=el("text",{x:x1,y:yb+34,"text-anchor":"end","font-size":11,fill:"var(--muted)"},s);tl.textContent="distance →";
+    const yl=el("text",{x:x0,y:18,"font-size":11,fill:"var(--muted)"},s);yl.textContent="echo strength (40 dB scale)";
+  }
+  // resolution demo
+  let sep=2.5, wname="rect";
+  function drawRes(){
+    $("sepv").textContent=sep.toFixed(1)+" m";
+    const s=$("res");s.innerHTML="";const w=win(wname==="hann"?"hann":"rect");
+    const Bf=115e6,S=Bf/T,r1=20-sep/2,r2=20+sep/2,f1=2*r1*S/C,f2=2*r2*S/C;
+    const ref=2*mag([0],0,w);const x0=50,x1=620,yb=170,h=140,rmin=14,rmax=26;
+    const pts=[];let prev=null;let peaks=0;const vals=[];
+    for(let i=0;i<=300;i++){const r=rmin+(rmax-rmin)*i/300;const f=2*r*S/C;const m=mag([f1,f2],f,w)/ref;const db=Math.max(-30,20*Math.log10(m+1e-9));vals.push(db);pts.push(`${x0+(x1-x0)*i/300},${yb-h*(db+30)/30}`);}
+    for(let i=1;i<vals.length-1;i++){if(vals[i]>vals[i-1]&&vals[i]>=vals[i+1]&&vals[i]>-6)peaks++;}
+    el("line",{x1:x0,y1:yb,x2:x1,y2:yb,stroke:"var(--muted)"},s);
+    el("polyline",{points:pts.join(" "),fill:"none",stroke:"var(--tx)","stroke-width":2.5},s);
+    for(const r of [r1,r2]){const x=x0+(x1-x0)*(r-rmin)/(rmax-rmin);el("line",{x1:x,y1:yb,x2:x,y2:yb-h,stroke:"var(--rx)","stroke-dasharray":"3 3"},s);}
+    for(let m=14;m<=26;m+=2){const x=x0+(x1-x0)*(m-rmin)/(rmax-rmin);const t=el("text",{x:x,y:yb+16,"text-anchor":"middle","font-size":11,fill:"var(--muted)"},s);t.textContent=m+" m";}
+    const lab=el("text",{x:x1,y:20,"text-anchor":"end","font-size":13,"font-weight":600,fill:peaks>=2?"var(--ok)":"var(--warn)"},s);
+    lab.textContent=peaks>=2?"Two peaks: resolved":"One blob: not resolved";
+    const k=el("text",{x:x0,y:20,"font-size":11,fill:"var(--rx)"},s);k.textContent="dashed = true positions";
+  }
+  function seg(a,b,on){a.setAttribute("aria-pressed",on);b.setAttribute("aria-pressed",!on);}
+  $("dist").addEventListener("input",e=>{R=+e.target.value;drawChirp();});
+  $("b115").addEventListener("click",()=>{B=115e6;F0=5.730e9;seg($("b115"),$("b150"),true);drawChirp();});
+  $("b150").addEventListener("click",()=>{B=150e6;F0=5.725e9;seg($("b115"),$("b150"),false);drawChirp();});
+  $("sep").addEventListener("input",e=>{sep=+e.target.value;drawRes();});
+  $("wr").addEventListener("click",()=>{wname="rect";seg($("wr"),$("wh"),true);drawRes();});
+  $("wh").addEventListener("click",()=>{wname="hann";seg($("wr"),$("wh"),false);drawRes();});
+  drawChirp();drawRes();
+})();
+</script>
+</body>
+</html>
