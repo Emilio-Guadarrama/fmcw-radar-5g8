@@ -6,7 +6,7 @@ Low-cost 5.8 GHz FMCW radar. Chirp from a PLL (ADF4159) plus VCO, ESP32-S3 for c
 
 ## New here? Start with the learning guide
 
-This is a learning project: we build it to learn how radar works, and we document it so others can learn with us. [docs/learn/](docs/learn/README.md) explains the whole project in plain language, with analogies, diagrams and a glossary. For an interactive version with sliders, open [docs/learn/radar-guide.html](docs/learn/radar-guide.html) in a web browser after downloading the repository.
+This is a learning project: we build it to learn how radar works, and we document it so others can learn with us. **[Open the interactive guide online](https://emilio-guadarrama.github.io/fmcw-radar-5g8/)**: the whole project in plain language, with analogies, diagrams you can play with, and a glossary. No download needed. The same content is also in [docs/learn/](docs/learn/README.md).
 
 ## Targets (assumptions, to be validated in simulation)
 

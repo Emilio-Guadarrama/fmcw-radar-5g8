@@ -2,7 +2,7 @@
 
 This project is a learning project. We are building a small, low-cost radar to learn how radar works, and we document it so that anyone can learn with us. You do not need a background in radio or signal processing to read this page.
 
-- **Interactive version:** download or clone the repository and open [radar-guide.html](radar-guide.html) in any web browser. It has sliders you can move to see how the radar reacts. GitHub shows HTML files as code, so it must be opened locally.
+- **Interactive version:** [open it online](https://emilio-guadarrama.github.io/fmcw-radar-5g8/). It has sliders you can move to see how the radar reacts. The source is [radar-guide.html](radar-guide.html), and it also works offline if you open it in a browser.
 - **This page** covers the same topics and displays directly on GitHub.
 
 > The numbers here are design targets (assumptions) or values calculated in simulation. **No hardware has been built or measured yet.** The source of truth is [requirements.md](../requirements.md) and the [decisions](../decisions/).
