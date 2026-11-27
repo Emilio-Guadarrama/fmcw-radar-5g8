@@ -1,0 +1,26 @@
+Status,Included (1 = yes),Component name,ID # (part number),Designator on schematic,#,LCSC,UNIT Electronics,Mouser MX,DigiKey MX,SnapMagic (symbol + footprint),Notes,Option,Unit price (USD),Ext (USD),Price basis,Type
+RF SIGNAL SOURCE,,,,,,,,,,,,,,,,
+New,1,VCO 5.5-6.1 GHz with buffer amp,HMC431LP4E,U1,1,,,Mouser,DigiKey,SnapMagic,"Most expensive part. DigiKey MX $27.50 @1, $24.01 @10. Forstén reported ~EUR 17 for his VCO (part not named). Check Vtune range in datasheet.",A+B,27.5,27.50,Verified,Parts
+New,1,VCO tuning amplifier (DAC 0-3.3 V to Vtune),TBD (low-noise op-amp),U2,1,,,,,,Option A only. Part and price not selected yet.,A,5,5.00,Estimate,Parts
+New,1,"Ramp DAC, SPI, 12-16 bit",TBD,U3,1,,,,,,Option A only. Ramp linearity is corrected in software.,A,5,5.00,Estimate,Parts
+New,1,Fractional-N PLL with FMCW ramp generator,ADF4159CCPZ-RL7,U4,1,C495333,,Mouser,DigiKey,SnapMagic,Option B only. LCSC snapshots: $9.34 and $11.09 @1; DigiKey MX $22.22 @1. Using the higher LCSC value. Needs loop filter and reference clock.,B,11.09,11.09,Verified,Parts
+New,1,Reference oscillator (TCXO) for PLL,TBD,Y1,1,,,,,,Option B only.,B,3,3.00,Estimate,Parts
+New,0,Power amplifier 4.9-5.8 GHz (DEFERRED for v1),SST11LP12-QCF,U5,1,,,Mouser,DigiKey,SnapMagic,"Forstén's PA. DigiKey lists it Obsolete, Microchip NRND, RS discontinued. Needs a replacement before it can be priced. v1 runs without a PA (bench use, low power).",A+B,,0.00,Not priced,Parts
+RF RECEIVE,,,,,,,,,,,,,,,,
+New,1,"LNA 4.8-6.0 GHz, NF 1.1 dB",HMC717ALP3E,U6,1,,,Mouser,DigiKey,SnapMagic,Replaces HMC717LP3E (obsolete). DigiKey MX $15.44 @1.,A+B,15.44,15.44,Verified,Parts
+New,1,Mixer 2.5-7 GHz,HMC219BMS8GE,U7,1,,,Mouser,DigiKey,SnapMagic,Replaces HMC219AMS8. DigiKey MX $18.14 @1. Check LO drive level against VCO output.,A+B,18.14,18.14,Verified,Parts
+New,1,"Splitter, attenuator pad, matching (PCB Wilkinson + 0603)",Printed on PCB + passives,-,1,,,,,,"Wilkinson divider as in Forstén's design: no part cost, board area only.",A+B,1,1.00,Estimate,Parts
+BASEBAND AND DIGITAL,,,,,,,,,,,,,,,,
+New,1,ADC 16-bit 1 MSPS SPI,ADS8860IDGS,U8,1,C2868279,,Mouser,DigiKey,SnapMagic,LCSC $17.99 @1; DigiKey MX $22.04 @1. Likely overkill: Forstén saw ~13 effective bits. Cheaper ADC or MCU ADC can do v0.,A+B,17.99,17.99,Verified,Parts
+New,1,"Dual low-noise op-amp (baseband gain, single-ended to diff)",LTC6241IDD#PBF,U9,2,,,Mouser,DigiKey,SnapMagic,Substitute for Forstén's LT6230 / LTC6242. DigiKey listing $5.84 @1. Final choice after baseband design.,A+B,5.84,11.68,Verified,Parts
+Keep,1,ESP32-S3 module 16 MB / 8 MB PSRAM,ESP32-S3-WROOM-1-N16R8,MCU1,1,C2913202,,Mouser,DigiKey,SnapMagic,"Same module as IGNIS V5 list. Price not looked up; reuse stock if you have it. ESP32-S3 has no DAC, so Option A needs the external DAC above.",A+B,8,8.00,Estimate,Parts
+"POWER, CONNECTORS, PASSIVES",,,,,,,,,,,,,,,,
+New,1,"Low-noise LDO 3.3 V / 3.0 V (analog, VCO, LNA)",TBD,"U10, U11",2,,,,,,,A+B,2,4.00,Estimate,Parts
+New,1,SMA edge connector (test ports),TBD,"J2, J3",2,,,,,,Forstén's SMA cost ~EUR 3 each. Add ground cutout under pad.,A+B,3,6.00,Estimate,Parts
+Keep,1,USB-C 16-pin (USB 2.0),TYPE-C-31-M-12,J1,1,C165948,,Mouser,DigiKey,SnapMagic,Same as IGNIS V5.,A+B,0.5,0.50,Estimate,Parts
+New,1,"Resistors, capacitors, ferrites (0402/0603)",Bulk,-,1,,,,,,Includes RF-grade caps near VCO / LNA.,A+B,10,10.00,Estimate,Parts
+"ONE-TIME COSTS (PER ORDER, NOT PER BOARD)",,,,,,,,,,,,,,,,
+New,1,"PCB 4-layer, controlled impedance, ~5 pcs (incl. shipping)",Fab order (JLCPCB),-,1,,,,,,"Price from you: ~$4 with shipping. Standard FR4. Check the instant quote with impedance control selected, extra fees can apply.",A+B,4,4.00,User,One-time
+New,1,Solder paste (stencil laser-cut at university),-,-,1,,,,,,Stencil is free via the university laser cutter. $10 is my estimate for paste only: set to 0 if you already have some.,A+B,10,10.00,Estimate,One-time
+New,1,VNA 6 GHz class (borrowed),LiteVNA-64 or similar,-,1,,,,,,Borrowed. Must reach 6 GHz: NanoVNA V2 stops at 3 GHz. Needed only for antenna S11 tuning.,A+B,0,0.00,User,One-time
+New,1,SMA attenuators + 50 ohm dummy load (SMA cables already owned),-,-,1,,,,,,"Cables already owned. Estimate covers 2 attenuators (e.g. 10 and 20 dB, 0-6 GHz) plus a load, for safe bench testing.",A+B,35,35.00,Estimate,One-time
