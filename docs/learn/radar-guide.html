@@ -81,7 +81,7 @@ body{margin:0}
   <div class="eyebrow">Learning guide · fmcw-radar-5g8 · status Nov 2026</div>
   <h1>SPECULA-1, explained simply</h1>
   <p class="lede">A small, cheap radar that measures how far away things are, using radio waves around 5.8 GHz. This page walks through how it works, what is in the repository, and where the project stands, with an analogy for every hard word.</p>
-  <p style="font-size:.9rem;color:var(--muted)">This guide is for learning. The numbers are design targets (assumptions) or calculated values from the simulation, not measurements. The source of truth is <a href="../requirements.md">docs/requirements.md</a> and the decisions in <a href="../decisions/">docs/decisions/</a>. Interactive charts are simplified illustrations, not the project's simulation.</p>
+  <p style="font-size:.9rem;color:var(--muted)">This guide is for learning. The numbers are design targets (assumptions) or calculated values from the simulation, not measurements. The source of truth is <a href="https://github.com/Emilio-Guadarrama/fmcw-radar-5g8/blob/main/docs/requirements.md">docs/requirements.md</a> and the decisions in <a href="https://github.com/Emilio-Guadarrama/fmcw-radar-5g8/tree/main/docs/decisions">docs/decisions/</a>. Interactive charts are simplified illustrations, not the project's simulation.</p>
   <div class="analogy"><b>The whole project in one sentence</b>It works like a bat. A bat squeaks and listens for the echo. This radar "squeaks" a radio tone whose pitch slides upward, listens for the echo, and works out the distance from how far the echo's pitch lags behind.</div>
 </header>
 
@@ -247,7 +247,7 @@ c = speed of light ≈ 300 000 km/s
 <section>
   <div class="eyebrow">Part 5 · The legal question</div>
   <h2>Why 115 MHz and not 150 MHz</h2>
-  <p>Radio frequencies are like lanes on a public highway: you need permission to drive in most of them. Mexico's regulator lists <span class="mono">5725–5850 MHz</span> as "free spectrum". The original plan swept up to 5875 MHz, 25 MHz outside the listed lane. So the team chose <a href="../decisions/001-sweep.md">decision 001</a>:</p>
+  <p>Radio frequencies are like lanes on a public highway: you need permission to drive in most of them. Mexico's regulator lists <span class="mono">5725–5850 MHz</span> as "free spectrum". The original plan swept up to 5875 MHz, 25 MHz outside the listed lane. So the team chose <a href="https://github.com/Emilio-Guadarrama/fmcw-radar-5g8/blob/main/docs/decisions/001-sweep.md">decision 001</a>:</p>
   <div class="panel scroll">
     <svg viewBox="0 0 640 170" style="width:100%;min-width:520px;display:block" role="img" aria-label="Frequency band map">
       <line x1="40" y1="140" x2="600" y2="140" stroke="var(--muted)"/>

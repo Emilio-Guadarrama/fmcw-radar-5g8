@@ -1,0 +1,40 @@
+# Publishes the learning guide (docs/learn/radar-guide.html) to GitHub Pages.
+# One-time setup by a repository admin: Settings > Pages > Source: "GitHub Actions".
+# Site: https://emilio-guadarrama.github.io/fmcw-radar-5g8/
+name: Publish learning guide
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/learn/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Build site
+        run: |
+          mkdir -p _site
+          cp docs/learn/radar-guide.html _site/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
